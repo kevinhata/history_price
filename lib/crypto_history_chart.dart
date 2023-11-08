@@ -11,6 +11,8 @@ class CryptoHistoryChart extends StatefulWidget {
 class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   List<Map<String, double>> cryptoData = [];
   String selectedInterval = "24H";
+  int from = 0;
+  int to = 0;
 
   @override
   void initState() {
@@ -44,16 +46,16 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   String _getApiUrlForInterval(String interval) {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (interval == "24H") {
-      final from = now - 86400;
-      final to = now;
+      from = now - 86400;
+      to = now;
       return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=5&from=$from&to=$to&symbol=USDTUSD';
     } else if (interval == "1W") {
-      final from = now - 604800;
-      final to = now;
+      from = now - 604800;
+      to = now;
       return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=60&from=$from&to=$to&symbol=USDTUSD';
     } else if (interval == "1M") {
-      final from = now - 2592000;
-      final to = now;
+      from = now - 2592000;
+      to = now;
       return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=240&from=$from&to=$to&symbol=USDTUSD';
     }
     return '';
@@ -88,8 +90,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           .map<double>((candle) => candle['close'] as double)
                           .reduce(
                               (max, current) => max > current ? max : current),
-                      minX: 0,
-                      maxX: cryptoData.length.toDouble() - 1,
+                      minX: 1699363200,
+                      maxX: 1699345500,
                       lineBarsData: [
                         LineChartBarData(
                           isCurved: false,
@@ -97,8 +99,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           spots: cryptoData.asMap().entries.map((entry) {
                             final index = entry.key;
                             final candle = entry.value;
-                            return FlSpot(
-                                index.toDouble(), candle['close'] as double);
+                            return FlSpot(candle['timestamp']!.toDouble(),
+                                candle['close'] as double);
                           }).toList(),
                           dotData: FlDotData(show: false),
                         ),
