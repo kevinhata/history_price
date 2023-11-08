@@ -44,17 +44,17 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   String _getApiUrlForInterval(String interval) {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (interval == "24H") {
-      final from = now - 86400; 
+      final from = now - 86400;
       final to = now;
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=$from&to=$to&symbol=USDTUSD';
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=5&from=$from&to=$to&symbol=USDTUSD';
     } else if (interval == "1W") {
-      final from = now - 604800; 
+      final from = now - 604800;
       final to = now;
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=$from&to=$to&symbol=USDTUSD';
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=60&from=$from&to=$to&symbol=USDTUSD';
     } else if (interval == "1M") {
-      final from = now - 2592000; 
+      final from = now - 2592000;
       final to = now;
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=$from&to=$to&symbol=USDTUSD';
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=240&from=$from&to=$to&symbol=USDTUSD';
     }
     return '';
   }
