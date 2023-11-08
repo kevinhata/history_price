@@ -92,6 +92,49 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                               (max, current) => max > current ? max : current),
                       minX: 1699363200,
                       maxX: 1699345500,
+                      lineTouchData: LineTouchData(
+                        getTouchedSpotIndicator: (barData, spotIndexes) {
+                          return spotIndexes.map((spotIndex) {
+                            final spot = barData.spots[spotIndex];
+                            if (spot.x == 0 || spot.x == 6) {
+                              return null;
+                            }
+                            return TouchedSpotIndicatorData(
+                              const FlLine(
+                                color: Colors.red,
+                                strokeWidth: 4,
+                              ),
+                              FlDotData(
+                                getDotPainter: (spot, percent, barData, index) {
+                                  return FlDotCirclePainter(
+                                    radius: 0,
+                                    color: Colors.white,
+                                    strokeWidth: 5,
+                                    strokeColor: Colors.blue,
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList();
+                        },
+                        touchTooltipData: LineTouchTooltipData(
+                          tooltipBgColor: Colors.transparent,
+                          tooltipRoundedRadius: 0,
+                          getTooltipItems: (touchedSpots) => touchedSpots
+                              .map(
+                                (e) => const LineTooltipItem(
+                                  '',
+                                  TextStyle(color: Colors.transparent),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        touchCallback: (p0, p1) {
+                          debugPrint(p1?.lineBarSpots?.first.x.toString());
+                          debugPrint(p1?.lineBarSpots?.first.y.toString());
+                        },
+                        handleBuiltInTouches: true,
+                      ),
                       lineBarsData: [
                         LineChartBarData(
                           isCurved: false,
