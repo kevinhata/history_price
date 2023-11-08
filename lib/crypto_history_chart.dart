@@ -97,10 +97,11 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           isCurved: false,
                           color: Colors.blue,
                           spots: cryptoData.asMap().entries.map((entry) {
-                            final index = entry.key;
                             final candle = entry.value;
-                            return FlSpot(candle['timestamp']!.toDouble(),
-                                candle['close'] as double);
+                            return FlSpot(
+                              candle['timestamp']!.toDouble(),
+                              candle['close']!.toDouble(),
+                            );
                           }).toList(),
                           dotData: FlDotData(show: false),
                         ),
