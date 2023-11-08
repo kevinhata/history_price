@@ -10,7 +10,7 @@ class CryptoHistoryChart extends StatefulWidget {
 
 class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   List<Map<String, double>> cryptoData = [];
-  String selectedInterval = "1m"; 
+  String selectedInterval = "24H";
 
   @override
   void initState() {
@@ -30,16 +30,10 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
       setState(() {
         cryptoData = candleData.map((candle) {
           final double timestamp = (candle['t'] as int).toDouble();
-          final double openPrice = candle['o'] as double;
-          final double highPrice = candle['h'] as double;
-          final double lowPrice = candle['l'] as double;
           final double closePrice = candle['c'] as double;
 
           return {
             'timestamp': timestamp,
-            'open': openPrice,
-            'high': highPrice,
-            'low': lowPrice,
             'close': closePrice,
           };
         }).toList();
@@ -48,12 +42,19 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   }
 
   String _getApiUrlForInterval(String interval) {
-    if (interval == "1m") {
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=1698986878&to=1698987358&symbol=USDTUSD';
-    } else if (interval == "5m") {
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=5&from=1698986878&to=1698987358&symbol=USDTUSD';
-    } else if (interval == "15m") {
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=15&from=1698986878&to=1698987358&symbol=USDTUSD';
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    if (interval == "24H") {
+      final from = now - 86400; 
+      final to = now;
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=$from&to=$to&symbol=USDTUSD';
+    } else if (interval == "1W") {
+      final from = now - 604800; 
+      final to = now;
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=$from&to=$to&symbol=USDTUSD';
+    } else if (interval == "1M") {
+      final from = now - 2592000; 
+      final to = now;
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=1&from=$from&to=$to&symbol=USDTUSD';
     }
     return '';
   }
@@ -80,11 +81,11 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                       gridData: FlGridData(show: false),
                       titlesData: FlTitlesData(show: false),
                       minY: cryptoData
-                          .map<double>((candle) => candle['low'] as double)
+                          .map<double>((candle) => candle['close'] as double)
                           .reduce(
                               (min, current) => min < current ? min : current),
                       maxY: cryptoData
-                          .map<double>((candle) => candle['high'] as double)
+                          .map<double>((candle) => candle['close'] as double)
                           .reduce(
                               (max, current) => max > current ? max : current),
                       minX: 0,
@@ -99,7 +100,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                             return FlSpot(
                                 index.toDouble(), candle['close'] as double);
                           }).toList(),
-                          dotData: FlDotData(show: true),
+                          dotData: FlDotData(show: false),
                         ),
                       ],
                     ),
@@ -112,21 +113,21 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
           children: [
             ElevatedButton(
               onPressed: () {
-                changeInterval("1m");
+                changeInterval("24H");
               },
-              child: Text('1m'),
+              child: Text('24H'),
             ),
             ElevatedButton(
               onPressed: () {
-                changeInterval("5m");
+                changeInterval("1W");
               },
-              child: Text('5m'),
+              child: Text('1W'),
             ),
             ElevatedButton(
               onPressed: () {
-                changeInterval("15m");
+                changeInterval("1M");
               },
-              child: Text('15m'),
+              child: Text('1M'),
             ),
           ],
         ),
