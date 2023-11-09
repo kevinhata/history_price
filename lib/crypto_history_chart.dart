@@ -21,27 +21,31 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   }
 
   Future<void> fetchData() async {
-    String apiUrl = _getApiUrlForInterval(selectedInterval);
-    final response = await http.get(Uri.parse(apiUrl));
+  String apiUrl = _getApiUrlForInterval(selectedInterval);
+  final response = await http.get(Uri.parse(apiUrl));
 
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final candleData =
-          List<Map<String, dynamic>>.from(jsonData['data']['candles']);
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    final candleData = jsonData['data']['candles'];
 
+    if (candleData != null && candleData is Iterable) {
       setState(() {
-        cryptoData = candleData.map((candle) {
-          final double timestamp = (candle['t'] as int).toDouble();
-          final double closePrice = candle['c'] as double;
+        cryptoData = List<Map<String, double>>.from(candleData.map((candle) {
+          final double timestamp = (candle['t'] as num).toDouble();
+          final double closePrice = (candle['c'] as num).toDouble();
 
           return {
             'timestamp': timestamp,
             'close': closePrice,
           };
-        }).toList();
+        }));
       });
+    } else {
+      print('Error: Candle data is null or not iterable');
     }
   }
+}
+
 
   String _getApiUrlForInterval(String interval) {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -52,11 +56,11 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     } else if (interval == "1W") {
       from = now - 604800;
       to = now;
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=60&from=$from&to=$to&symbol=USDTUSD';
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=30&from=$from&to=$to&symbol=USDTUSD';
     } else if (interval == "1M") {
       from = now - 2592000;
       to = now;
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=240&from=$from&to=$to&symbol=USDTUSD';
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=120&from=$from&to=$to&symbol=USDTUSD';
     }
     return '';
   }
@@ -67,6 +71,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
       fetchData();
     });
   }
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +86,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
             child: cryptoData.isNotEmpty
                 ? LineChart(
                     LineChartData(
-                      gridData: FlGridData(show: false),
-                      titlesData: FlTitlesData(show: false),
+                      gridData: FlGridData(show: true),
+                      
                       minY: cryptoData
                           .map<double>((candle) => candle['close'] as double)
                           .reduce(
@@ -90,8 +96,12 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           .map<double>((candle) => candle['close'] as double)
                           .reduce(
                               (max, current) => max > current ? max : current),
-                      minX: 1699363200,
-                      maxX: 1699345500,
+                      minX: cryptoData.isNotEmpty
+                          ? cryptoData.first['timestamp']!.toDouble()
+                          : 0,
+                      maxX: cryptoData.isNotEmpty
+                          ? cryptoData.last['timestamp']!.toDouble()
+                          : 1,
                       lineTouchData: LineTouchData(
                         getTouchedSpotIndicator: (barData, spotIndexes) {
                           return spotIndexes.map((spotIndex) {
