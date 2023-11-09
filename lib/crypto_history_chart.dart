@@ -21,31 +21,30 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   }
 
   Future<void> fetchData() async {
-  String apiUrl = _getApiUrlForInterval(selectedInterval);
-  final response = await http.get(Uri.parse(apiUrl));
+    String apiUrl = _getApiUrlForInterval(selectedInterval);
+    final response = await http.get(Uri.parse(apiUrl));
 
-  if (response.statusCode == 200) {
-    final jsonData = json.decode(response.body);
-    final candleData = jsonData['data']['candles'];
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final candleData = jsonData['data']['candles'];
 
-    if (candleData != null && candleData is Iterable) {
-      setState(() {
-        cryptoData = List<Map<String, double>>.from(candleData.map((candle) {
-          final double timestamp = (candle['t'] as num).toDouble();
-          final double closePrice = (candle['c'] as num).toDouble();
+      if (candleData != null && candleData is Iterable) {
+        setState(() {
+          cryptoData = List<Map<String, double>>.from(candleData.map((candle) {
+            final double timestamp = (candle['t'] as num).toDouble();
+            final double closePrice = (candle['c'] as num).toDouble();
 
-          return {
-            'timestamp': timestamp,
-            'close': closePrice,
-          };
-        }));
-      });
-    } else {
-      print('Error: Candle data is null or not iterable');
+            return {
+              'timestamp': timestamp,
+              'close': closePrice,
+            };
+          }));
+        });
+      } else {
+        print('Error: Candle data is null or not iterable');
+      }
     }
   }
-}
-
 
   String _getApiUrlForInterval(String interval) {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -72,8 +71,6 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     });
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -86,8 +83,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
             child: cryptoData.isNotEmpty
                 ? LineChart(
                     LineChartData(
-                      gridData: FlGridData(show: true),
-                      
+                      gridData: FlGridData(show: false),
+                      titlesData: FlTitlesData(show: false),
                       minY: cryptoData
                           .map<double>((candle) => candle['close'] as double)
                           .reduce(
@@ -148,14 +145,15 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                       lineBarsData: [
                         LineChartBarData(
                           isCurved: false,
-                          color: Colors.blue,
+                          color: Colors.green, 
                           spots: cryptoData.asMap().entries.map((entry) {
                             final candle = entry.value;
                             return FlSpot(
                               candle['timestamp']!.toDouble(),
                               candle['close']!.toDouble(),
                             );
-                          }).toList(),
+                          }).toList()
+                            ..sort((a, b) => a.x.compareTo(b.x)),
                           dotData: FlDotData(show: false),
                         ),
                       ],
@@ -167,22 +165,31 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 changeInterval("24H");
               },
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+              ),
               child: Text('24H'),
             ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 changeInterval("1W");
               },
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+              ),
               child: Text('1W'),
             ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 changeInterval("1M");
               },
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+              ),
               child: Text('1M'),
             ),
           ],
