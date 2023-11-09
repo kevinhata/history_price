@@ -9,13 +9,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: CryptoHistoryApp(),
       theme: ThemeData(
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black, 
+          backgroundColor: Colors.black,
         ),
-        scaffoldBackgroundColor:
-            Colors.black, 
+        scaffoldBackgroundColor: Colors.black,
       ),
     );
   }
@@ -29,18 +29,14 @@ class CryptoHistoryApp extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            
-          },
+          onPressed: () {},
         ),
         title: Text('USDTUSD'),
         centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.menu),
-            onPressed: () {
-              
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -65,7 +61,7 @@ class CryptoHistoryApp extends StatelessWidget {
                     onTap: () {},
                     child: Icon(
                       Icons.info,
-                      color: Colors.grey,
+                      color: Colors.blue,
                     ),
                   ),
                 ),
@@ -82,7 +78,6 @@ class CryptoHistoryApp extends StatelessWidget {
             SizedBox(height: 16),
             CryptoHistoryChart(),
             SizedBox(height: 16),
-            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -93,8 +88,7 @@ class CryptoHistoryApp extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     primary: Colors.green,
                     onPrimary: Colors.white,
-                    fixedSize: Size(150,
-                        45), 
+                    fixedSize: Size(150, 45),
                   ),
                   child: Text(
                     'Buy',
@@ -108,8 +102,7 @@ class CryptoHistoryApp extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                     onPrimary: Colors.white,
-                    fixedSize: Size(150,
-                        45), 
+                    fixedSize: Size(150, 45),
                   ),
                   child: Text(
                     'Sell',
