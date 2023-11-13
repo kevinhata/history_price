@@ -28,9 +28,18 @@ class CryptoHistoryApp extends StatefulWidget {
 
 class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
   String? touchedY;
+  List<Map<String, double>> cryptoData = [];
 
   @override
   Widget build(BuildContext context) {
+    double percentageChange = 0.0;
+
+    if (cryptoData.isNotEmpty) {
+      double earliestPrice = cryptoData.first['close']!;
+      double latestPrice = cryptoData.last['close']!;
+
+      percentageChange = ((latestPrice - earliestPrice) / earliestPrice) * 100;
+    }
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -76,14 +85,16 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
             ),
             SizedBox(height: 8),
             Text(
-              '+1.58%',
+              percentageChange != 0.0
+                  ? '${percentageChange.toStringAsFixed(2)}%'
+                  : '0.00%',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.green,
+                color: percentageChange > 0 ? Colors.green : Colors.red,
               ),
             ),
             SizedBox(height: 16),
-             CryptoHistoryChart(
+            CryptoHistoryChart(
               onTouchedYChanged: (String? newY) {
                 setState(() {
                   touchedY = newY;

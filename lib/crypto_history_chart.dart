@@ -63,7 +63,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     } else if (interval == "1M") {
       from = now - 2592000;
       to = now;
-      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=120&from=$from&to=$to&symbol=USDTUSD';
+      return 'https://dev-api.hata.io/orderbook/api/candles/history?resolution=240&from=$from&to=$to&symbol=USDTUSD';
     }
     return '';
   }
@@ -145,6 +145,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           debugPrint(p1?.lineBarSpots?.first.y.toString());
                           widget.onTouchedYChanged(
                               p1?.lineBarSpots?.first.y.toString());
+                              
                           setState(() {
                             touchedY = p1?.lineBarSpots?.first.y.toString();
                           });
