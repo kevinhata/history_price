@@ -4,6 +4,9 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 
 class CryptoHistoryChart extends StatefulWidget {
+  final Function(String?) onTouchedYChanged;
+
+  CryptoHistoryChart({required this.onTouchedYChanged});
   @override
   _CryptoHistoryChartState createState() => _CryptoHistoryChartState();
 }
@@ -13,6 +16,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   String selectedInterval = "24H";
   int from = 0;
   int to = 0;
+  String? touchedY;
 
   @override
   void initState() {
@@ -117,7 +121,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                                     radius: 0,
                                     color: Colors.white,
                                     strokeWidth: 5,
-                                    strokeColor: Colors.blue,
+                                    strokeColor: Colors.red,
                                   );
                                 },
                               ),
@@ -139,13 +143,18 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                         touchCallback: (p0, p1) {
                           debugPrint(p1?.lineBarSpots?.first.x.toString());
                           debugPrint(p1?.lineBarSpots?.first.y.toString());
+                          widget.onTouchedYChanged(
+                              p1?.lineBarSpots?.first.y.toString());
+                          setState(() {
+                            touchedY = p1?.lineBarSpots?.first.y.toString();
+                          });
                         },
                         handleBuiltInTouches: true,
                       ),
                       lineBarsData: [
                         LineChartBarData(
                           isCurved: false,
-                          color: Colors.green, 
+                          color: Colors.green,
                           spots: cryptoData.asMap().entries.map((entry) {
                             final candle = entry.value;
                             return FlSpot(

@@ -21,7 +21,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class CryptoHistoryApp extends StatelessWidget {
+class CryptoHistoryApp extends StatefulWidget {
+  @override
+  _CryptoHistoryAppState createState() => _CryptoHistoryAppState();
+}
+
+class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
+  String? touchedY;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +55,7 @@ class CryptoHistoryApp extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '\$300',
+                  touchedY != null ? '\$$touchedY' : '\$100',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -76,14 +83,20 @@ class CryptoHistoryApp extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            CryptoHistoryChart(),
+             CryptoHistoryChart(
+              onTouchedYChanged: (String? newY) {
+                setState(() {
+                  touchedY = newY;
+                });
+              },
+            ),
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    
+                    // ... existing code ...
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.green,
@@ -97,7 +110,7 @@ class CryptoHistoryApp extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    
+                    // ... existing code ...
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
