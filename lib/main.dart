@@ -36,12 +36,9 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    
   }
 
-  Future<void> fetchData() async {
-    // Your existing fetchData method...
-  }
 
   @override
   Widget build(BuildContext context) {
