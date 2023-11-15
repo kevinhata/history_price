@@ -103,27 +103,8 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
                 color: percentageChange > 0 ? Colors.green : Colors.red,
               ),
             ),
-            SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Highest Value: ${highestClose != null ? '\$$highestClose' : 'N/A'}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Lowest Value: ${lowestClose != null ? '\$${lowestClose!.toStringAsFixed(5)}' : 'N/A'}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+            
+            
             SizedBox(height: 16),
             CryptoHistoryChart(
               onTouchedYChanged: (String? newY) {

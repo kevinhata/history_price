@@ -106,6 +106,21 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+      if (highestClose != null && lowestClose != null)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              'Highest Close: $highestClose',
+              style: TextStyle(color: Colors.white),
+            ),
+            Text(
+              'Lowest Close: $lowestClose',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
         Center(
           child: Container(
             width: MediaQuery.of(context).size.width,
