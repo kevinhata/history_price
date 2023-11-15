@@ -111,11 +111,11 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              'Highest Close: $highestClose',
+              'Highest Price: $highestClose',
               style: TextStyle(color: Colors.white),
             ),
             Text(
-              'Lowest Close: $lowestClose',
+              'Lowest Price: $lowestClose',
               style: TextStyle(color: Colors.white),
             ),
           ],
