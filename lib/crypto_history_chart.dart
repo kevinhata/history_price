@@ -59,9 +59,11 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 .toList();
 
             if (closeValues.isNotEmpty) {
-              highestClose = closeValues.reduce(math.max);
-              lowestClose = closeValues.reduce(math.min);
-            } 
+              setState(() {
+                highestClose = closeValues.reduce(math.max);
+                lowestClose = closeValues.reduce(math.min);
+              });
+            }
           }
 
           print("cryptoData: $cryptoData");
