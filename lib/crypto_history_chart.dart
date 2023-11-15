@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
+import 'dart:math' as math;
 
 class CryptoHistoryChart extends StatefulWidget {
   final Function(String?) onTouchedYChanged;
+  final double? highestClose;
+  final double? lowestClose;
 
-  CryptoHistoryChart({required this.onTouchedYChanged});
+  CryptoHistoryChart({
+    required this.onTouchedYChanged,
+    required this.highestClose,
+    required this.lowestClose,
+  });
   @override
   _CryptoHistoryChartState createState() => _CryptoHistoryChartState();
 }
@@ -17,6 +24,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   int from = 0;
   int to = 0;
   String? touchedY;
+  double? highestClose;
+  double? lowestClose;
 
   @override
   void initState() {
@@ -43,6 +52,21 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
               'close': closePrice,
             };
           }));
+          if (cryptoData.isNotEmpty) {
+            final closeValues = cryptoData
+                .map<double?>((candle) => candle['close'])
+                .whereType<double>()
+                .toList();
+
+            if (closeValues.isNotEmpty) {
+              highestClose = closeValues.reduce(math.max);
+              lowestClose = closeValues.reduce(math.min);
+            } 
+          }
+
+          print("cryptoData: $cryptoData");
+          print("highestClose: $highestClose");
+          print("lowestClose: $lowestClose");
         });
       } else {
         print('Error: Candle data is null or not iterable');
@@ -145,7 +169,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           debugPrint(p1?.lineBarSpots?.first.y.toString());
                           widget.onTouchedYChanged(
                               p1?.lineBarSpots?.first.y.toString());
-                              
+
                           setState(() {
                             touchedY = p1?.lineBarSpots?.first.y.toString();
                           });

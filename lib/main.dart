@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'crypto_history_chart.dart';
+import 'dart:math' as math;
 
 void main() {
   runApp(MyApp());
@@ -29,6 +30,18 @@ class CryptoHistoryApp extends StatefulWidget {
 class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
   String? touchedY;
   List<Map<String, double>> cryptoData = [];
+  double? highestClose;
+  double? lowestClose;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    // Your existing fetchData method...
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +50,9 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
     if (cryptoData.isNotEmpty) {
       double earliestPrice = cryptoData.first['close']!;
       double latestPrice = cryptoData.last['close']!;
-
       percentageChange = ((latestPrice - earliestPrice) / earliestPrice) * 100;
     }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -94,21 +107,42 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
               ),
             ),
             SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Highest Close: ${highestClose != null ? '\$${highestClose!.toStringAsFixed(5)}' : 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Lowest Close: ${lowestClose != null ? '\$${lowestClose!.toStringAsFixed(5)}' : 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
             CryptoHistoryChart(
               onTouchedYChanged: (String? newY) {
                 setState(() {
                   touchedY = newY;
                 });
               },
+              highestClose: highestClose,
+              lowestClose: lowestClose,
             ),
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // ... existing code ...
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     primary: Colors.green,
                     onPrimary: Colors.white,
@@ -120,9 +154,7 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // ... existing code ...
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                     onPrimary: Colors.white,
