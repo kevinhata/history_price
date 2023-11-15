@@ -111,7 +111,7 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Highest Close: ${highestClose != null ? '\$$highestClose' : 'N/A'}',
+                  'Highest Value: ${highestClose != null ? '\$$highestClose' : 'N/A'}',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -119,7 +119,7 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Lowest Close: ${lowestClose != null ? '\$${lowestClose!.toStringAsFixed(5)}' : 'N/A'}',
+                  'Lowest Value: ${lowestClose != null ? '\$${lowestClose!.toStringAsFixed(5)}' : 'N/A'}',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
