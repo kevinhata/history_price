@@ -14,9 +14,9 @@ class MyApp extends StatelessWidget {
       home: CryptoHistoryApp(),
       theme: ThemeData(
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black,
+          backgroundColor: const Color(0xFF0A132E)
         ),
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor:  const Color(0xFF0A132E)
       ),
     );
   }
@@ -87,7 +87,7 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
                     onTap: () {},
                     child: Icon(
                       Icons.info,
-                      color: Colors.blue,
+                      color: const Color(0xFF02A7FF),
                     ),
                   ),
                 ),
@@ -100,7 +100,7 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
                   : '0.00%',
               style: TextStyle(
                 fontSize: 16,
-                color: percentageChange > 0 ? Colors.green : Colors.red,
+                color: percentageChange > 0 ? const Color(0xFF1FBC7B) : const Color(0xFFE54545),
               ),
             ),
             
@@ -117,14 +117,14 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
             ),
             SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.green,
+                    primary: const Color(0xFF1FBC7B),
                     onPrimary: Colors.white,
-                    fixedSize: Size(150, 45),
+                    fixedSize: Size(155, 45),
                   ),
                   child: Text(
                     'Buy',
@@ -134,9 +134,9 @@ class _CryptoHistoryAppState extends State<CryptoHistoryApp> {
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
+                    primary: const Color(0xFFE54545),
                     onPrimary: Colors.white,
-                    fixedSize: Size(150, 45),
+                    fixedSize: Size(155, 45),
                   ),
                   child: Text(
                     'Sell',

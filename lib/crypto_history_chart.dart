@@ -8,6 +8,10 @@ class CryptoHistoryChart extends StatefulWidget {
   final Function(String?) onTouchedYChanged;
   final double? highestClose;
   final double? lowestClose;
+  final List<Color> gradientColors = [
+    const Color(0xFF6BD0BE),
+    const Color(0xFFD9D9D9),
+  ];
 
   CryptoHistoryChart({
     required this.onTouchedYChanged,
@@ -108,7 +112,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (highestClose != null && lowestClose != null)
-          Row(
+          /* Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
@@ -120,8 +124,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 style: TextStyle(color: Colors.white),
               ),
             ],
-          ),
-        SizedBox(height: 16),
+          ), */
+        SizedBox(height: 24),
         Center(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -131,6 +135,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                     LineChartData(
                       gridData: FlGridData(show: false),
                       titlesData: FlTitlesData(show: false),
+                      borderData: FlBorderData(show: false),
                       minY: cryptoData
                           .map<double>((candle) => candle['close'] as double)
                           .reduce(
@@ -171,42 +176,40 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           }).toList();
                         },
                         touchTooltipData: LineTouchTooltipData(
-  tooltipBgColor: Colors.transparent,
-  tooltipRoundedRadius: 8,
-  getTooltipItems: (List<LineBarSpot> touchedSpots) {
-    if (touchedSpots.isNotEmpty) {
-      final spot = touchedSpots.first;
-      final isHighest = spot.y == highestClose;
-      final isLowest = spot.y == lowestClose;
+                          tooltipBgColor: Colors.transparent,
+                          tooltipRoundedRadius: 8,
+                          getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                            if (touchedSpots.isNotEmpty) {
+                              final spot = touchedSpots.first;
+                              final isHighest = spot.y == highestClose;
+                              final isLowest = spot.y == lowestClose;
 
-      if (isHighest || isLowest) {
-        return [
-          LineTooltipItem(
-            '${isHighest ? 'Highest' : 'Lowest'}: ${spot.y.toString()}',
-            TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ];
-      }
-    }
+                              if (isHighest || isLowest) {
+                                return [
+                                  LineTooltipItem(
+                                    '${isHighest ? 'Highest' : 'Lowest'}: ${spot.y.toString()}',
+                                    TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ];
+                              }
+                            }
 
-    // Default tooltip for other points
-    return touchedSpots.map((LineBarSpot touchedSpot) {
-      return LineTooltipItem(
-        touchedSpot.y.toString(),
-        TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-      );
-    }).toList();
-  },
-),
-
+                            return touchedSpots.map((LineBarSpot touchedSpot) {
+                              return LineTooltipItem(
+                                touchedSpot.y.toString(),
+                                TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              );
+                            }).toList();
+                          },
+                        ),
                         touchCallback: (p0, p1) {
                           debugPrint(p1?.lineBarSpots?.first.x.toString());
                           debugPrint(p1?.lineBarSpots?.first.y.toString());
@@ -222,7 +225,24 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                       lineBarsData: [
                         LineChartBarData(
                           isCurved: false,
-                          color: Colors.green,
+                          color: const Color(0xFF1FBC7B),
+                          barWidth: 1,
+                          isStrokeCapRound: false,
+                          belowBarData: BarAreaData(
+                              show: true,
+                              
+                              gradient: LinearGradient(
+                                colors: [
+                                  
+                                  Colors.grey.shade700,
+                                  const Color(0xFF0A132E),
+                                ],
+                                stops: [0.1,1],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                /* transform: GradientRotation(math.pi / 4) */
+                              )
+                              ),
                           spots: cryptoData.asMap().entries.map((entry) {
                             final candle = entry.value;
                             return FlSpot(
@@ -252,39 +272,45 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 : Center(child: CircularProgressIndicator()),
           ),
         ),
+        SizedBox(height: 24),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextButton(
-              onPressed: () {
-                changeInterval("24H");
-              },
-              style: TextButton.styleFrom(
-                primary: selectedInterval == "24H" ? Colors.blue : Colors.white,
-              ),
-              child: Text('24H'),
-            ),
-            TextButton(
-              onPressed: () {
-                changeInterval("1W");
-              },
-              style: TextButton.styleFrom(
-                primary: selectedInterval == "1W" ? Colors.blue : Colors.white,
-              ),
-              child: Text('1W'),
-            ),
-            TextButton(
-              onPressed: () {
-                changeInterval("1M");
-              },
-              style: TextButton.styleFrom(
-                primary: selectedInterval == "1M" ? Colors.blue : Colors.white,
-              ),
-              child: Text('1M'),
-            ),
+            _buildIntervalButton("24H"),
+            _buildIntervalButton("1W"),
+            _buildIntervalButton("1M"),
           ],
         ),
       ],
     );
   }
+
+Widget _buildIntervalButton(String interval) {
+  bool isSelected = selectedInterval == interval;
+
+  return Container(
+    width: 55,
+    height: 45, 
+    decoration: isSelected
+        ? BoxDecoration(
+            border: Border.all(color: const Color(0xFF315FE8)),
+            borderRadius: BorderRadius.circular(8),
+            color: const Color(0xFF315FE8),
+          )
+        : null,
+    child: TextButton(
+      onPressed: () {
+        changeInterval(interval);
+      },
+      style: TextButton.styleFrom(
+        primary: isSelected ? Colors.white : Colors.white,
+      ),
+      child: Text(
+        interval,
+        style: TextStyle(fontSize: 12), 
+      ),
+    ),
+  );
+}
+
 }
