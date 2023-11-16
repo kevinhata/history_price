@@ -14,6 +14,7 @@ class CryptoHistoryChart extends StatefulWidget {
     required this.highestClose,
     required this.lowestClose,
   });
+
   @override
   _CryptoHistoryChartState createState() => _CryptoHistoryChartState();
 }
@@ -106,20 +107,20 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-      if (highestClose != null && lowestClose != null)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              'Highest Price: $highestClose',
-              style: TextStyle(color: Colors.white),
-            ),
-            Text(
-              'Lowest Price: $lowestClose',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
+        if (highestClose != null && lowestClose != null)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                'Highest Price: $highestClose',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                'Lowest Price: $lowestClose',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
         SizedBox(height: 16),
         Center(
           child: Container(
@@ -170,17 +171,42 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           }).toList();
                         },
                         touchTooltipData: LineTouchTooltipData(
-                          tooltipBgColor: Colors.transparent,
-                          tooltipRoundedRadius: 0,
-                          getTooltipItems: (touchedSpots) => touchedSpots
-                              .map(
-                                (e) => const LineTooltipItem(
-                                  '',
-                                  TextStyle(color: Colors.transparent),
-                                ),
-                              )
-                              .toList(),
-                        ),
+  tooltipBgColor: Colors.transparent,
+  tooltipRoundedRadius: 8,
+  getTooltipItems: (List<LineBarSpot> touchedSpots) {
+    if (touchedSpots.isNotEmpty) {
+      final spot = touchedSpots.first;
+      final isHighest = spot.y == highestClose;
+      final isLowest = spot.y == lowestClose;
+
+      if (isHighest || isLowest) {
+        return [
+          LineTooltipItem(
+            '${isHighest ? 'Highest' : 'Lowest'}: ${spot.y.toString()}',
+            TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ];
+      }
+    }
+
+    // Default tooltip for other points
+    return touchedSpots.map((LineBarSpot touchedSpot) {
+      return LineTooltipItem(
+        touchedSpot.y.toString(),
+        TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      );
+    }).toList();
+  },
+),
+
                         touchCallback: (p0, p1) {
                           debugPrint(p1?.lineBarSpots?.first.x.toString());
                           debugPrint(p1?.lineBarSpots?.first.y.toString());
@@ -205,7 +231,20 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                             );
                           }).toList()
                             ..sort((a, b) => a.x.compareTo(b.x)),
-                          dotData: FlDotData(show: false),
+                          dotData: FlDotData(
+                            show: true,
+                            getDotPainter: (spot, percent, barData, index) {
+                              final isHighest = spot.y == highestClose;
+                              final isLowest = spot.y == lowestClose;
+
+                              return FlDotCirclePainter(
+                                radius: isHighest || isLowest ? 3 : 0,
+                                color: Colors.white,
+                                strokeWidth: isHighest || isLowest ? 1 : 0,
+                                strokeColor: Colors.red,
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -221,7 +260,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 changeInterval("24H");
               },
               style: TextButton.styleFrom(
-                primary: Colors.white,
+                primary: selectedInterval == "24H" ? Colors.blue : Colors.white,
               ),
               child: Text('24H'),
             ),
@@ -230,7 +269,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 changeInterval("1W");
               },
               style: TextButton.styleFrom(
-                primary: Colors.white,
+                primary: selectedInterval == "1W" ? Colors.blue : Colors.white,
               ),
               child: Text('1W'),
             ),
@@ -239,7 +278,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 changeInterval("1M");
               },
               style: TextButton.styleFrom(
-                primary: Colors.white,
+                primary: selectedInterval == "1M" ? Colors.blue : Colors.white,
               ),
               child: Text('1M'),
             ),
