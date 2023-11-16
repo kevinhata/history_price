@@ -237,7 +237,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                                   Colors.grey.shade700,
                                   const Color(0xFF0A132E),
                                 ],
-                                stops: [0.1,1],
+                                stops: [0.2,1],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 /* transform: GradientRotation(math.pi / 4) */
