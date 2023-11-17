@@ -111,8 +111,8 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (highestClose != null && lowestClose != null)
-          /* Row(
+         if (highestClose != null && lowestClose != null)
+            Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
@@ -124,7 +124,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 style: TextStyle(color: Colors.white),
               ),
             ],
-          ), */
+          ),  
         SizedBox(height: 24),
         Center(
           child: Container(
