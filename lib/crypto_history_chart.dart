@@ -25,12 +25,15 @@ class CryptoHistoryChart extends StatefulWidget {
 
 class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
   List<Map<String, double>> cryptoData = [];
+  List<int> showingTooltipOnSpots = [0, 1, 2, 3, 4];
   String selectedInterval = "24H";
   int from = 0;
   int to = 0;
   String? touchedY;
   double? highestClose;
   double? lowestClose;
+  FlSpot? highestPoint;
+  FlSpot? lowestPoint;
 
   @override
   void initState() {
@@ -76,7 +79,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
           print("lowestClose: $lowestClose");
         });
       } else {
-        print('Error: Candle data is null or not iterable');
+        print('Error');
       }
     }
   }
@@ -106,13 +109,14 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     });
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-         if (highestClose != null && lowestClose != null)
-            Row(
+        if (highestClose != null && lowestClose != null)
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
@@ -124,8 +128,9 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                 style: TextStyle(color: Colors.white),
               ),
             ],
-          ),  
-        SizedBox(height: 24),
+          ),
+          
+        SizedBox(height: 48),
         Center(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -133,6 +138,11 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
             child: cryptoData.isNotEmpty
                 ? LineChart(
                     LineChartData(
+                      /* showingTooltipIndicators: showingTooltipOnSpots.map((index){
+                        return ShowingTooltipIndicators([
+                          LineBarSpot(LineChartBarData, barIndex, spot)
+                        ]);
+                      }).toList() , */
                       gridData: FlGridData(show: false),
                       titlesData: FlTitlesData(show: false),
                       borderData: FlBorderData(show: false),
@@ -145,10 +155,10 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           .reduce(
                               (max, current) => max > current ? max : current),
                       minX: cryptoData.isNotEmpty
-                          ? cryptoData.first['timestamp']!.toDouble()
+                          ? cryptoData.last['timestamp']!.toDouble()
                           : 0,
                       maxX: cryptoData.isNotEmpty
-                          ? cryptoData.last['timestamp']!.toDouble()
+                          ? cryptoData.first['timestamp']!.toDouble()
                           : 1,
                       lineTouchData: LineTouchData(
                         getTouchedSpotIndicator: (barData, spotIndexes) {
@@ -176,6 +186,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           }).toList();
                         },
                         touchTooltipData: LineTouchTooltipData(
+                          fitInsideHorizontally: true,
                           tooltipBgColor: Colors.transparent,
                           tooltipRoundedRadius: 8,
                           getTooltipItems: (List<LineBarSpot> touchedSpots) {
@@ -229,26 +240,31 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                           barWidth: 1,
                           isStrokeCapRound: false,
                           belowBarData: BarAreaData(
-                              show: true,
-                              
-                              gradient: LinearGradient(
-                                colors: [
-                                  
-                                  Colors.grey.shade700,
-                                  const Color(0xFF0A132E),
-                                ],
-                                stops: [0.2,1],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                /* transform: GradientRotation(math.pi / 4) */
-                              )
-                              ),
+                            show: true,
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.grey.shade700,
+                                const Color(0xFF0A132E),
+                              ],
+                              stops: [0.2, 1],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                          ),
                           spots: cryptoData.asMap().entries.map((entry) {
                             final candle = entry.value;
-                            return FlSpot(
-                              candle['timestamp']!.toDouble(),
-                              candle['close']!.toDouble(),
-                            );
+                            final timestamp = candle['timestamp']!.toDouble();
+                            final close = candle['close']!.toDouble();
+
+                            
+                            if (close == highestClose) {
+                              highestPoint = FlSpot(timestamp, close);
+                            }
+                            if (close == lowestClose) {
+                              lowestPoint = FlSpot(timestamp, close);
+                            }
+
+                            return FlSpot(timestamp, close);
                           }).toList()
                             ..sort((a, b) => a.x.compareTo(b.x)),
                           dotData: FlDotData(
@@ -285,32 +301,31 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     );
   }
 
-Widget _buildIntervalButton(String interval) {
-  bool isSelected = selectedInterval == interval;
+  Widget _buildIntervalButton(String interval) {
+    bool isSelected = selectedInterval == interval;
 
-  return Container(
-    width: 55,
-    height: 45, 
-    decoration: isSelected
-        ? BoxDecoration(
-            border: Border.all(color: const Color(0xFF315FE8)),
-            borderRadius: BorderRadius.circular(8),
-            color: const Color(0xFF315FE8),
-          )
-        : null,
-    child: TextButton(
-      onPressed: () {
-        changeInterval(interval);
-      },
-      style: TextButton.styleFrom(
-        primary: isSelected ? Colors.white : Colors.white,
+    return Container(
+      width: 55,
+      height: 45,
+      decoration: isSelected
+          ? BoxDecoration(
+              border: Border.all(color: const Color(0xFF315FE8)),
+              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFF315FE8),
+            )
+          : null,
+      child: TextButton(
+        onPressed: () {
+          changeInterval(interval);
+        },
+        style: TextButton.styleFrom(
+          primary: isSelected ? Colors.white : Colors.white,
+        ),
+        child: Text(
+          interval,
+          style: TextStyle(fontSize: 12),
+        ),
       ),
-      child: Text(
-        interval,
-        style: TextStyle(fontSize: 12), 
-      ),
-    ),
-  );
-}
-
+    );
+  }
 }
