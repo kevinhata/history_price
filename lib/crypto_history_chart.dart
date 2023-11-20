@@ -13,14 +13,15 @@ class CryptoHistoryChart extends StatefulWidget {
     const Color(0xFFD9D9D9),
   ];
 
-  CryptoHistoryChart({
+   CryptoHistoryChart({
     required this.onTouchedYChanged,
     required this.highestClose,
     required this.lowestClose,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
-  _CryptoHistoryChartState createState() => _CryptoHistoryChartState();
+  State<CryptoHistoryChart> createState() => _CryptoHistoryChartState();
 }
 
 class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
@@ -109,9 +110,60 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
     });
   }
 
-  
   @override
   Widget build(BuildContext context) {
+    final lineBarsData = [
+      LineChartBarData(
+        isCurved: false,
+        color: const Color(0xFF1FBC7B),
+        barWidth: 1,
+        isStrokeCapRound: false,
+        belowBarData: BarAreaData(
+          show: true,
+          gradient: LinearGradient(
+            colors: [
+              Colors.grey.shade700,
+              const Color(0xFF0A132E),
+            ],
+            stops: [0.2, 1],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        spots: cryptoData.asMap().entries.map((entry) {
+          final candle = entry.value;
+          final timestamp = candle['timestamp']!.toDouble();
+          final close = candle['close']!.toDouble();
+
+          if (close == highestClose) {
+            highestPoint = FlSpot(timestamp, close);
+          }
+          if (close == lowestClose) {
+            lowestPoint = FlSpot(timestamp, close);
+          }
+
+          return FlSpot(timestamp, close);
+        }).toList()
+          ..sort((a, b) => a.x.compareTo(b.x)),
+        dotData: FlDotData(
+          show: true,
+          getDotPainter: (spot, percent, barData, index) {
+            final isHighest = spot.y == highestClose;
+            final isLowest = spot.y == lowestClose;
+
+            return FlDotCirclePainter(
+              radius: isHighest || isLowest ? 3 : 0,
+              color: Colors.white,
+              strokeWidth: isHighest || isLowest ? 1 : 0,
+              strokeColor: Colors.red,
+              
+                  
+            );
+          },
+        ),
+      ),
+    ];
+    final tooltipsOnBar = lineBarsData[0];
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -129,7 +181,6 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
               ),
             ],
           ),
-          
         SizedBox(height: 48),
         Center(
           child: Container(
@@ -138,11 +189,16 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
             child: cryptoData.isNotEmpty
                 ? LineChart(
                     LineChartData(
-                      /* showingTooltipIndicators: showingTooltipOnSpots.map((index){
+                      showingTooltipIndicators:
+                          showingTooltipOnSpots.map((index) {
                         return ShowingTooltipIndicators([
-                          LineBarSpot(LineChartBarData, barIndex, spot)
+                          LineBarSpot(
+                            tooltipsOnBar,
+                            lineBarsData.indexOf(tooltipsOnBar),
+                            tooltipsOnBar.spots[index],
+                          ),
                         ]);
-                      }).toList() , */
+                      }).toList(),
                       gridData: FlGridData(show: false),
                       titlesData: FlTitlesData(show: false),
                       borderData: FlBorderData(show: false),
@@ -233,56 +289,7 @@ class _CryptoHistoryChartState extends State<CryptoHistoryChart> {
                         },
                         handleBuiltInTouches: true,
                       ),
-                      lineBarsData: [
-                        LineChartBarData(
-                          isCurved: false,
-                          color: const Color(0xFF1FBC7B),
-                          barWidth: 1,
-                          isStrokeCapRound: false,
-                          belowBarData: BarAreaData(
-                            show: true,
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.grey.shade700,
-                                const Color(0xFF0A132E),
-                              ],
-                              stops: [0.2, 1],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                          ),
-                          spots: cryptoData.asMap().entries.map((entry) {
-                            final candle = entry.value;
-                            final timestamp = candle['timestamp']!.toDouble();
-                            final close = candle['close']!.toDouble();
-
-                            
-                            if (close == highestClose) {
-                              highestPoint = FlSpot(timestamp, close);
-                            }
-                            if (close == lowestClose) {
-                              lowestPoint = FlSpot(timestamp, close);
-                            }
-
-                            return FlSpot(timestamp, close);
-                          }).toList()
-                            ..sort((a, b) => a.x.compareTo(b.x)),
-                          dotData: FlDotData(
-                            show: true,
-                            getDotPainter: (spot, percent, barData, index) {
-                              final isHighest = spot.y == highestClose;
-                              final isLowest = spot.y == lowestClose;
-
-                              return FlDotCirclePainter(
-                                radius: isHighest || isLowest ? 3 : 0,
-                                color: Colors.white,
-                                strokeWidth: isHighest || isLowest ? 1 : 0,
-                                strokeColor: Colors.red,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                      lineBarsData: lineBarsData,
                     ),
                   )
                 : Center(child: CircularProgressIndicator()),
